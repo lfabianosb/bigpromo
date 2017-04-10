@@ -3,8 +3,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 import com.google.gson.Gson;
 
@@ -46,11 +47,8 @@ public class WorkerProcess {
 				if (flight.getPrice() < 8000) {
 					System.out.println("Preco: " + flight.getPrice());
 					
-					DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-					String dateTime = dtf.format(LocalDateTime.now());
-					
 					Slack slack = new Slack();
-					String resp = slack.sendMessage("[" + dateTime + "] Comprar voo " + flight);
+					String resp = slack.sendMessage("[" + getCurrentDateTime() + "] Comprar voo " + flight);
 					System.out.println(resp);
 				}
 
@@ -70,5 +68,12 @@ public class WorkerProcess {
 	private static Flight jsonToFlight(String json) {
 		Gson gson = new Gson();
 		return gson.fromJson(json, Flight.class);
+	}
+	
+	private static String getCurrentDateTime() {
+		LocalDateTime now = LocalDateTime.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")
+				.withLocale(new Locale("pt", "BR"));
+		return now.format(formatter);
 	}
 }
