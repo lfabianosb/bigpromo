@@ -44,7 +44,7 @@ public class WorkerProcess {
 				System.out.println(flight);
 
 				if (flight.getPrice() < 8000) {
-					System.out.println("Preço: " + flight.getPrice());
+					System.out.println("Preco: " + flight.getPrice());
 					
 					DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 					String dateTime = dtf.format(LocalDateTime.now());
@@ -56,6 +56,7 @@ public class WorkerProcess {
 
 				Thread.sleep(600000); // 10min
 			} catch (Exception e) {
+				Slack slack = new Slack();
 				slack.sendMessage("Erro: " + e.getMessage());
 				e.printStackTrace();
 			} finally {
