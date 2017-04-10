@@ -50,7 +50,7 @@ public class WorkerProcess {
 					System.out.println(resp);
 				}
 
-				Thread.sleep(300000); // 5min
+				Thread.sleep(60000); // 1min
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {

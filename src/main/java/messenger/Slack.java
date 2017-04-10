@@ -15,7 +15,7 @@ public class Slack {
 	private static final String POST = "POST";
 	private static final String PAYLOAD = "payload=";
 	private static final String UTF_8 = "UTF-8";
-	private static final String URL = "<url>";
+	private static final String URL = System.getenv("SLACK_WEBHOOK");
 
 	public String sendMessage(String message) {
 		HttpURLConnection connection = null;
