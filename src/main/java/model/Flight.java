@@ -66,7 +66,7 @@ public class Flight {
 	
 	@Override
 	public String toString() {
-		return getTo() + ", " + getFrom() + ", " + getDateDeparture() + ", " + getDateArrival() + ", "
+		return getFrom() + ", " + getTo() + ", " + getDateDeparture() + ", " + getDateArrival() + ", "
 				+ getAdult() + ", " + getChild() + ", " + getPrice();
 	}
 	

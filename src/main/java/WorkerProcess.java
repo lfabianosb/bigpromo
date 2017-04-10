@@ -4,6 +4,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
@@ -16,6 +17,7 @@ public class WorkerProcess {
 
 	private static final String GET = "GET";
 	private static final String URL = "https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SCL&dayDep=13&monthDep=6&yearDep=2017&dayArr=18&monthArr=6&yearArr=2017&adult=2&child=0";
+	private static final String ZONE_ID = "GMT-03:00";
 
 	public static void main(String[] args) {
 		while (true) {
@@ -44,7 +46,7 @@ public class WorkerProcess {
 				Flight flight = jsonToFlight(response.toString());
 				System.out.println(flight);
 
-				if (flight.getPrice() < 8000) {
+				if (flight.getPrice() < 5000) {
 					System.out.println("Preco: " + flight.getPrice());
 					
 					Slack slack = new Slack();
@@ -71,9 +73,9 @@ public class WorkerProcess {
 	}
 	
 	private static String getCurrentDateTime() {
-		LocalDateTime now = LocalDateTime.now();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")
-				.withLocale(new Locale("pt", "BR"));
+		ZoneId zoneId = ZoneId.of(ZONE_ID);
+		LocalDateTime now = LocalDateTime.now(zoneId);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 		return now.format(formatter);
 	}
 }
