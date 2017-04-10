@@ -29,6 +29,8 @@ public class Slack {
 			jsonMsg.addProperty("icon_emoji", ":airplane:");
 			
 			// Create connection
+			System.out.println("Web Hook: " + URL);
+			
 			URL url = new URL(URL);
 			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod(POST);
