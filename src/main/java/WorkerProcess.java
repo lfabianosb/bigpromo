@@ -3,6 +3,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 
 import com.google.gson.Gson;
 
@@ -12,13 +14,10 @@ import model.Flight;
 public class WorkerProcess {
 
 	private static final String GET = "GET";
-	private static final String URL = "https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SCL&dayDep=12&monthDep=6&yearDep=2017&dayArr=17&monthArr=6&yearArr=2017&adult=2&child=0";
+	private static final String URL = "https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SCL&dayDep=13&monthDep=6&yearDep=2017&dayArr=18&monthArr=6&yearArr=2017&adult=2&child=0";
 
 	public static void main(String[] args) {
 		while (true) {
-
-			System.out.println("Worker process woke up");
-
 			HttpURLConnection connection = null;
 			try {
 				// Create connection
@@ -44,14 +43,20 @@ public class WorkerProcess {
 				Flight flight = jsonToFlight(response.toString());
 				System.out.println(flight);
 
-				if (flight.getPrice() < 2000) {
+				if (flight.getPrice() < 8000) {
+					System.out.println("Preço: " + flight.getPrice());
+					
+					DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+					String dateTime = dtf.format(LocalDateTime.now());
+					
 					Slack slack = new Slack();
-					String resp = slack.sendMessage("Comprar voo " + flight);
+					String resp = slack.sendMessage("[" + dateTime + "] Comprar voo " + flight);
 					System.out.println(resp);
 				}
 
-				Thread.sleep(60000); // 1min
+				Thread.sleep(600000); // 10min
 			} catch (Exception e) {
+				slack.sendMessage("Erro: " + e.getMessage());
 				e.printStackTrace();
 			} finally {
 				if (connection != null) {
