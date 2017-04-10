@@ -44,7 +44,7 @@ public class WorkerProcess {
 				Flight flight = jsonToFlight(response.toString());
 				System.out.println(flight);
 
-				if (flight.getPrice() < 1000) {
+				if (flight.getPrice() < 2000) {
 					Slack slack = new Slack();
 					String resp = slack.sendMessage("Comprar voo " + flight);
 					System.out.println(resp);
