@@ -66,46 +66,4 @@ public class Slack {
 			}
 		}
 	}
-
-//	private String send(JsonObject message) {
-//		HttpURLConnection connection = null;
-//		try {
-//			// Create connection
-//			final URL url = new URL(URL);
-//			connection = (HttpURLConnection) url.openConnection();
-//			connection.setRequestMethod(POST);
-//			connection.setConnectTimeout(10000); // 10s
-//			connection.setUseCaches(false);
-//			connection.setDoInput(true);
-//			connection.setDoOutput(true);
-//
-//			final String payload = PAYLOAD + URLEncoder.encode(message.toString(), UTF_8);
-//
-//			// Send request
-//			final DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-//			wr.writeBytes(payload);
-//			wr.flush();
-//			wr.close();
-//
-//			// Get Response
-//			final InputStream is = connection.getInputStream();
-//			final BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-//			String line;
-//			StringBuilder response = new StringBuilder();
-//			while ((line = rd.readLine()) != null) {
-//				response.append(line);
-//				response.append('\n');
-//			}
-//
-//			rd.close();
-//			return response.toString();
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			return "fail";
-//		} finally {
-//			if (connection != null) {
-//				connection.disconnect();
-//			}
-//		}
-//	}
 }
