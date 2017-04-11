@@ -32,7 +32,7 @@ public class Slack {
 			URL url = new URL(URL);
 			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod(POST);
-			connection.setConnectTimeout(10000); // 10s
+			connection.setConnectTimeout(20000); // 20s
 			connection.setUseCaches(false);
 			connection.setDoInput(true);
 			connection.setDoOutput(true);
