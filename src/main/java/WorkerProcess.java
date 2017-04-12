@@ -32,11 +32,8 @@ public class WorkerProcess {
 				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SAO&dayDep=6&monthDep=5&yearDep=2017&dayArr=9&monthArr=5&yearArr=2017&adult=2&child=0",
 				450f);
 		flights.put(
-				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SCL&dayDep=15&monthDep=6&yearDep=2017&dayArr=18&monthArr=6&yearArr=2017&adult=2&child=0",
-				1200f);
-		flights.put(
 				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SAO&dayDep=15&monthDep=6&yearDep=2017&dayArr=18&monthArr=6&yearArr=2017&adult=2&child=0",
-				4500f);
+				450f);
 	}
 
 	public static void main(String[] args) {
@@ -100,7 +97,7 @@ public class WorkerProcess {
 			}
 
 			try {
-				Thread.sleep(60000); // 1min
+				Thread.sleep(300000); // 5min
 			} catch (InterruptedException e) {
 				Slack slack = new Slack();
 				slack.sendMessage("Erro: " + e.getMessage());
