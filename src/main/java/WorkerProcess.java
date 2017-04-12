@@ -31,6 +31,12 @@ public class WorkerProcess {
 		flights.put(
 				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SAO&dayDep=6&monthDep=5&yearDep=2017&dayArr=9&monthArr=5&yearArr=2017&adult=2&child=0",
 				450f);
+		flights.put(
+				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SCL&dayDep=15&monthDep=6&yearDep=2017&dayArr=18&monthArr=6&yearArr=2017&adult=2&child=0",
+				1200f);
+		flights.put(
+				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SAO&dayDep=15&monthDep=6&yearDep=2017&dayArr=18&monthArr=6&yearArr=2017&adult=2&child=0",
+				4500f);
 	}
 
 	public static void main(String[] args) {
@@ -66,7 +72,7 @@ public class WorkerProcess {
 
 					System.out.println(flight);
 
-					if (flight.getPrice() < (Float) mentry.getValue()) {
+					if (flight.getPriceTotal() < (Float) mentry.getValue()) {
 						Slack slack = new Slack();
 						String resp = slack.sendMessage("[" + getCurrentDateTime() + "] Comprar voo " + flight);
 						System.out.println("Resposta da mensagem enviada para o Slack: " + resp);
@@ -94,7 +100,7 @@ public class WorkerProcess {
 			}
 
 			try {
-				Thread.sleep(600000); // 10min
+				Thread.sleep(60000); // 1min
 			} catch (InterruptedException e) {
 				Slack slack = new Slack();
 				slack.sendMessage("Erro: " + e.getMessage());
