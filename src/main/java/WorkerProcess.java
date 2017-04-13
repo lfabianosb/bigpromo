@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
+
 import com.google.gson.Gson;
 
 import messenger.Slack;
@@ -23,7 +25,7 @@ public class WorkerProcess {
 
 	static {
 		flights.put(
-				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SCL&dayDep=13&monthDep=6&yearDep=2017&dayArr=18&monthArr=6&yearArr=2017&adult=2&child=0",
+				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SCL&dayDep=14&monthDep=6&yearDep=2017&dayArr=18&monthArr=6&yearArr=2017&adult=2&child=0",
 				1200f);
 		flights.put(
 				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=MVD&dayDep=14&monthDep=6&yearDep=2017&dayArr=18&monthArr=6&yearArr=2017&adult=2&child=0",
@@ -33,8 +35,8 @@ public class WorkerProcess {
 				450f);
 		flights.put(
 				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SAO&dayDep=15&monthDep=6&yearDep=2017&dayArr=18&monthArr=6&yearArr=2017&adult=2&child=0",
-				450f);
-	}
+				4500f);
+}
 
 	public static void main(String[] args) {
 		while (true) {
@@ -54,25 +56,31 @@ public class WorkerProcess {
 					connection.setDoInput(true);
 					connection.setDoOutput(true);
 
-					// Get Response
-					final InputStream is = connection.getInputStream();
-					final BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-					String line;
-					StringBuilder response = new StringBuilder();
-					while ((line = rd.readLine()) != null) {
-						response.append(line);
-						response.append('\n');
-					}
-					rd.close();
+					int code = connection.getResponseCode();
+					String msg = connection.getResponseMessage();
 
-					Flight flight = jsonToFlight(response.toString());
+					boolean isError = connection.getResponseCode() >= 400;
+					InputStream is = isError ? connection.getErrorStream() : connection.getInputStream();
+					String contentEncoding = connection.getContentEncoding() != null ? connection.getContentEncoding()
+							: "UTF-8";
+					String response = IOUtils.toString(is, contentEncoding);
+					is.close();
 
-					System.out.println(flight);
-
-					if (flight.getPriceTotal() < (Float) mentry.getValue()) {
+					if (isError) {
 						Slack slack = new Slack();
-						String resp = slack.sendMessage("[" + getCurrentDateTime() + "] Comprar voo " + flight);
-						System.out.println("Resposta da mensagem enviada para o Slack: " + resp);
+						String resp = slack.sendMessage("[" + getCurrentDateTime() + "] Ocorreu o seguinte erro: "
+								+ response + "\nURL: " + mentry.getKey().toString());
+						System.err.println("Ocorreu o seguinte erro: " + response);
+					} else {
+						Flight flight = jsonToFlight(response.toString());
+
+						System.out.println(flight);
+
+						if (flight.getPriceTotal() < (Float) mentry.getValue()) {
+							Slack slack = new Slack();
+							String resp = slack.sendMessage("[" + getCurrentDateTime() + "] Comprar voo " + flight);
+							System.out.println("Resposta da mensagem enviada para o Slack: " + resp);
+						}
 					}
 				} catch (Exception e) {
 					Slack slack = new Slack();
@@ -85,7 +93,7 @@ public class WorkerProcess {
 					}
 				}
 
-				//Esperar 5 segundos entre as requisições
+				// Esperar 5 segundos entre as requisições
 				try {
 					Thread.sleep(5000);
 				} catch (InterruptedException e) {
@@ -97,7 +105,7 @@ public class WorkerProcess {
 			}
 
 			try {
-				Thread.sleep(300000); // 5min
+				Thread.sleep(60000); // 1min
 			} catch (InterruptedException e) {
 				Slack slack = new Slack();
 				slack.sendMessage("Erro: " + e.getMessage());
