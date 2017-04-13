@@ -21,21 +21,28 @@ public class WorkerProcess {
 
 	private static final String GET = "GET";
 	private static final String ZONE_ID = "GMT-03:00";
+	private static final String CHARSET = "UTF-8";
 	private static HashMap<String, Float> flights = new HashMap<String, Float>();
 
 	static {
 		flights.put(
-				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SCL&dayDep=14&monthDep=6&yearDep=2017&dayArr=18&monthArr=6&yearArr=2017&adult=2&child=0",
+				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SCL&dayDep=13&monthDep=6&yearDep=2017&dayArr=18&monthArr=6&yearArr=2017&adult=2&child=0",
 				1200f);
 		flights.put(
 				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=MVD&dayDep=14&monthDep=6&yearDep=2017&dayArr=18&monthArr=6&yearArr=2017&adult=2&child=0",
 				1200f);
 		flights.put(
 				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SAO&dayDep=6&monthDep=5&yearDep=2017&dayArr=9&monthArr=5&yearArr=2017&adult=2&child=0",
-				450f);
+				480f);
+		flights.put(
+				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SAO&dayDep=29&monthDep=4&yearDep=2017&dayArr=1&monthArr=5&yearArr=2017&adult=2&child=0",
+				480f);
 		flights.put(
 				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SAO&dayDep=15&monthDep=6&yearDep=2017&dayArr=18&monthArr=6&yearArr=2017&adult=2&child=0",
-				4500f);
+				480f);
+		flights.put(
+				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=CWB&dayDep=15&monthDep=6&yearDep=2017&dayArr=18&monthArr=6&yearArr=2017&adult=2&child=0",
+				560f);
 }
 
 	public static void main(String[] args) {
@@ -62,7 +69,7 @@ public class WorkerProcess {
 					boolean isError = connection.getResponseCode() >= 400;
 					InputStream is = isError ? connection.getErrorStream() : connection.getInputStream();
 					String contentEncoding = connection.getContentEncoding() != null ? connection.getContentEncoding()
-							: "UTF-8";
+							: CHARSET;
 					String response = IOUtils.toString(is, contentEncoding);
 					is.close();
 
@@ -105,7 +112,7 @@ public class WorkerProcess {
 			}
 
 			try {
-				Thread.sleep(60000); // 1min
+				Thread.sleep(300000); // 5min
 			} catch (InterruptedException e) {
 				Slack slack = new Slack();
 				slack.sendMessage("Erro: " + e.getMessage());
