@@ -81,7 +81,7 @@ public class WorkerProcess {
 					} else {
 						Flight flight = jsonToFlight(response.toString());
 
-						System.out.println(flight);
+						System.out.println("[" + getCurrentDateTime() + "] " + flight);
 
 						if (flight.getPriceTotal() < (Float) mentry.getValue()) {
 							Slack slack = new Slack();
