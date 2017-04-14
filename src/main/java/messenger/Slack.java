@@ -16,18 +16,23 @@ public class Slack {
 	private static final String PAYLOAD = "payload=";
 	private static final String UTF_8 = "UTF-8";
 	private static final String URL = System.getenv("SLACK_WEBHOOK");
+	public static final int INFO = 0;
+	public static final int ERROR = 1;
 
-	public String sendMessage(String message) {
+	public String sendMessage(String message, int type) {
 		HttpURLConnection connection = null;
-		
+
 		try {
 			// Message
 			JsonObject jsonMsg = new JsonObject();
 			jsonMsg.addProperty("channel", "#general");
 			jsonMsg.addProperty("username", "webhookbot");
 			jsonMsg.addProperty("text", message);
-			jsonMsg.addProperty("icon_emoji", ":airplane:");
-			
+			if (type == Slack.ERROR) // ERROR
+				jsonMsg.addProperty("icon_emoji", ":bug:");
+			else // INFO
+				jsonMsg.addProperty("icon_emoji", ":airplane:");
+
 			// Create connection
 			URL url = new URL(URL);
 			connection = (HttpURLConnection) url.openConnection();

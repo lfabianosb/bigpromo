@@ -76,7 +76,7 @@ public class WorkerProcess {
 					if (isError) {
 						Slack slack = new Slack();
 						String resp = slack.sendMessage("[" + getCurrentDateTime() + "] Ocorreu o seguinte erro: "
-								+ response + "\nURL: " + mentry.getKey().toString());
+								+ response + "\nURL: " + mentry.getKey().toString(), Slack.ERROR);
 						System.err.println("Ocorreu o seguinte erro: " + response);
 					} else {
 						Flight flight = jsonToFlight(response.toString());
@@ -85,13 +85,13 @@ public class WorkerProcess {
 
 						if (flight.getPriceTotal() < (Float) mentry.getValue()) {
 							Slack slack = new Slack();
-							String resp = slack.sendMessage("[" + getCurrentDateTime() + "] Comprar voo " + flight);
+							String resp = slack.sendMessage("[" + getCurrentDateTime() + "] Comprar voo " + flight, Slack.INFO);
 							System.out.println("Resposta da mensagem enviada para o Slack: " + resp);
 						}
 					}
 				} catch (Exception e) {
 					Slack slack = new Slack();
-					slack.sendMessage("Erro: " + e.getMessage());
+					slack.sendMessage("Erro: " + e.getMessage(), Slack.ERROR);
 					System.err.println("Erro: " + e.getMessage());
 					e.printStackTrace();
 				} finally {
@@ -105,7 +105,7 @@ public class WorkerProcess {
 					Thread.sleep(5000);
 				} catch (InterruptedException e) {
 					Slack slack = new Slack();
-					slack.sendMessage("Erro: " + e.getMessage());
+					slack.sendMessage("Erro: " + e.getMessage(), Slack.ERROR);
 					System.err.println("Erro: " + e.getMessage());
 					e.printStackTrace();
 				}
@@ -115,7 +115,7 @@ public class WorkerProcess {
 				Thread.sleep(300000); // 5min
 			} catch (InterruptedException e) {
 				Slack slack = new Slack();
-				slack.sendMessage("Erro: " + e.getMessage());
+				slack.sendMessage("Erro: " + e.getMessage(), Slack.ERROR);
 				System.err.println("Erro: " + e.getMessage());
 				e.printStackTrace();
 			}
