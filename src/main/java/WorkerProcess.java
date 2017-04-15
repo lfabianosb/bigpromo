@@ -1,6 +1,4 @@
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -43,7 +41,7 @@ public class WorkerProcess {
 		flights.put(
 				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=CWB&dayDep=15&monthDep=6&yearDep=2017&dayArr=18&monthArr=6&yearArr=2017&adult=2&child=0",
 				560f);
-}
+	}
 
 	public static void main(String[] args) {
 		while (true) {
@@ -85,7 +83,8 @@ public class WorkerProcess {
 
 						if (flight.getPriceTotal() < (Float) mentry.getValue()) {
 							Slack slack = new Slack();
-							String resp = slack.sendMessage("[" + getCurrentDateTime() + "] Comprar voo " + flight, Slack.INFO);
+							String resp = slack.sendMessage("[" + getCurrentDateTime() + "] Comprar voo " + flight,
+									Slack.INFO);
 							System.out.println("Resposta da mensagem enviada para o Slack: " + resp);
 						}
 					}
