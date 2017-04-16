@@ -61,10 +61,10 @@ public class WorkerProcess {
 					connection.setDoInput(true);
 					connection.setDoOutput(true);
 
-					int code = connection.getResponseCode();
-					String msg = connection.getResponseMessage();
+					int codeResponse = connection.getResponseCode();
+					String msgResponse = connection.getResponseMessage();
 
-					boolean isError = connection.getResponseCode() >= 400;
+					boolean isError = codeResponse >= 400;
 					InputStream is = isError ? connection.getErrorStream() : connection.getInputStream();
 					String contentEncoding = connection.getContentEncoding() != null ? connection.getContentEncoding()
 							: CHARSET;
@@ -73,9 +73,11 @@ public class WorkerProcess {
 
 					if (isError) {
 						Slack slack = new Slack();
-						String resp = slack.sendMessage("[" + getCurrentDateTime() + "] Ocorreu o seguinte erro: "
-								+ response + "\nURL: " + mentry.getKey().toString(), Slack.ERROR);
-						System.err.println("Ocorreu o seguinte erro: " + response);
+						slack.sendMessage("[" + getCurrentDateTime() + "] Ocorreu o seguinte erro: " + response
+								+ "\nURL: " + mentry.getKey().toString() + "\nResponse: " + codeResponse + " - "
+								+ msgResponse, Slack.ERROR);
+						System.err.println("Ocorreu o seguinte erro: " + response + "\nResponse: " + codeResponse + " - "
+								+ msgResponse);
 					} else {
 						Flight flight = jsonToFlight(response.toString());
 
