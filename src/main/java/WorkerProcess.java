@@ -76,9 +76,8 @@ public class WorkerProcess {
 
 					if (isError) {
 						Slack slack = new Slack();
-						slack.sendMessage("[" + getCurrentDateTime() + "] Ocorreu o seguinte erro: " + response
-								+ "\nURL: " + mentry.getKey().toString() + "\nResponse: " + codeResponse + " - "
-								+ msgResponse, Slack.ERROR);
+						slack.sendMessage("[" + getCurrentDateTime() + "] Ocorreu o seguinte erro: " + codeResponse
+								+ " - " + msgResponse + "\nURL: " + mentry.getKey().toString(), Slack.ERROR);
 						System.err.println("Ocorreu o seguinte erro: " + response + "\nResponse: " + codeResponse + " - "
 								+ msgResponse);
 					} else {
