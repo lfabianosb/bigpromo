@@ -24,23 +24,20 @@ public class WorkerProcess {
 
 	static {
 		flights.put(
-				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SCL&dayDep=13&monthDep=6&yearDep=2017&dayArr=18&monthArr=6&yearArr=2017&adult=2&child=0",
-				1200f);
+				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SCL&dayDep=28&monthDep=10&yearDep=2017&dayArr=4&monthArr=11&yearArr=2017&adult=2&child=0",
+				1100f);
 		flights.put(
-				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=MVD&dayDep=14&monthDep=6&yearDep=2017&dayArr=18&monthArr=6&yearArr=2017&adult=2&child=0",
-				1200f);
+				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=MVD&dayDep=28&monthDep=10&yearDep=2017&dayArr=4&monthArr=11&yearArr=2017&adult=2&child=0",
+				1100f);
 		flights.put(
 				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SAO&dayDep=6&monthDep=5&yearDep=2017&dayArr=9&monthArr=5&yearArr=2017&adult=2&child=0",
-				480f);
-		flights.put(
-				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SAO&dayDep=29&monthDep=4&yearDep=2017&dayArr=1&monthArr=5&yearArr=2017&adult=2&child=0",
 				480f);
 		flights.put(
 				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SAO&dayDep=15&monthDep=6&yearDep=2017&dayArr=18&monthArr=6&yearArr=2017&adult=2&child=0",
 				480f);
 		flights.put(
 				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=CWB&dayDep=15&monthDep=6&yearDep=2017&dayArr=18&monthArr=6&yearArr=2017&adult=2&child=0",
-				560f);
+				590f);
 	}
 
 	public static void main(String[] args) {
