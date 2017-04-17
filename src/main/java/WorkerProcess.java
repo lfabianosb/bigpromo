@@ -27,7 +27,13 @@ public class WorkerProcess {
 				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SCL&dayDep=28&monthDep=10&yearDep=2017&dayArr=4&monthArr=11&yearArr=2017&adult=2&child=0",
 				1100f);
 		flights.put(
+				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SCL&dayDep=29&monthDep=10&yearDep=2017&dayArr=4&monthArr=11&yearArr=2017&adult=2&child=0",
+				1100f);
+		flights.put(
 				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=MVD&dayDep=28&monthDep=10&yearDep=2017&dayArr=4&monthArr=11&yearArr=2017&adult=2&child=0",
+				1100f);
+		flights.put(
+				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=MVD&dayDep=29&monthDep=10&yearDep=2017&dayArr=4&monthArr=11&yearArr=2017&adult=2&child=0",
 				1100f);
 		flights.put(
 				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SAO&dayDep=6&monthDep=5&yearDep=2017&dayArr=9&monthArr=5&yearArr=2017&adult=2&child=0",
