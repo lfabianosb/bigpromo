@@ -59,7 +59,7 @@ public class WorkerProcess {
 					URL url = new URL(mentry.getKey().toString());
 					connection = (HttpURLConnection) url.openConnection();
 					connection.setRequestMethod(GET);
-					connection.setConnectTimeout(20000); // 20s
+					connection.setConnectTimeout(30000); // 30s
 					connection.setUseCaches(false);
 					connection.setDoInput(true);
 					connection.setDoOutput(true);
