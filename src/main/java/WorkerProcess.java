@@ -44,6 +44,19 @@ public class WorkerProcess {
 		flights.put(
 				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=CWB&dayDep=15&monthDep=6&yearDep=2017&dayArr=18&monthArr=6&yearArr=2017&adult=2&child=0",
 				590f);
+		flights.put(
+				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=VIX&dayDep=23&monthDep=9&yearDep=2017&dayArr=30&monthArr=9&yearArr=2017&adult=2&child=0",
+				820f);
+		flights.put(
+				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=VIX&dayDep=24&monthDep=9&yearDep=2017&dayArr=30&monthArr=9&yearArr=2017&adult=2&child=0",
+				820f);
+		flights.put(
+				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=VIX&dayDep=23&monthDep=9&yearDep=2017&dayArr=29&monthArr=9&yearArr=2017&adult=2&child=0",
+				820f);
+		flights.put(
+				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=VIX&dayDep=24&monthDep=9&yearDep=2017&dayArr=29&monthArr=9&yearArr=2017&adult=2&child=0",
+				820f);
+
 	}
 
 	public static void main(String[] args) {
