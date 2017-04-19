@@ -20,6 +20,7 @@ public class WorkerProcess {
 	private static final String GET = "GET";
 	private static final String ZONE_ID = "GMT-03:00";
 	private static final String CHARSET = "UTF-8";
+	private static final int CONNECTION_TIMEOUT = 30000; // 30s
 	private static HashMap<String, Float> flights = new HashMap<String, Float>();
 
 	static {
@@ -72,7 +73,7 @@ public class WorkerProcess {
 					URL url = new URL(mentry.getKey().toString());
 					connection = (HttpURLConnection) url.openConnection();
 					connection.setRequestMethod(GET);
-					connection.setConnectTimeout(30000); // 30s
+					connection.setConnectTimeout(CONNECTION_TIMEOUT);
 					connection.setUseCaches(false);
 					connection.setDoInput(true);
 					connection.setDoOutput(true);
@@ -116,9 +117,9 @@ public class WorkerProcess {
 					}
 				}
 
-				// Esperar 5 segundos entre as requisições
+				// Esperar 30 segundos entre as requisições
 				try {
-					Thread.sleep(5000);
+					Thread.sleep(30000);
 				} catch (InterruptedException e) {
 					Slack slack = new Slack();
 					slack.sendMessage("Erro: " + e.getMessage(), Slack.ERROR);
@@ -128,7 +129,7 @@ public class WorkerProcess {
 			}
 
 			try {
-				Thread.sleep(300000); // 5min
+				Thread.sleep(120000); // 2min
 			} catch (InterruptedException e) {
 				Slack slack = new Slack();
 				slack.sendMessage("Erro: " + e.getMessage(), Slack.ERROR);
