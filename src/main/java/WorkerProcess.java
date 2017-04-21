@@ -1,12 +1,13 @@
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 
@@ -14,6 +15,7 @@ import com.google.gson.Gson;
 
 import messenger.Slack;
 import model.Flight;
+import model.FlightMonitor;
 
 public class WorkerProcess {
 
@@ -21,56 +23,83 @@ public class WorkerProcess {
 	private static final String ZONE_ID = "GMT-03:00";
 	private static final String CHARSET = "UTF-8";
 	private static final int CONNECTION_TIMEOUT = 30000; // 30s
-	private static HashMap<String, Float> flights = new HashMap<String, Float>();
+	private static final String URL_JSON_FLIGHTS = "https://json-ds.herokuapp.com/flights";
+	private static final String URL_FLIGHT_SERVICE = "https://bigpromoservice.herokuapp.com";
 
-	static {
-		flights.put(
-				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SCL&dayDep=28&monthDep=10&yearDep=2017&dayArr=4&monthArr=11&yearArr=2017&adult=2&child=0",
-				1100f);
-		flights.put(
-				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SCL&dayDep=29&monthDep=10&yearDep=2017&dayArr=4&monthArr=11&yearArr=2017&adult=2&child=0",
-				1100f);
-		flights.put(
-				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=MVD&dayDep=28&monthDep=10&yearDep=2017&dayArr=4&monthArr=11&yearArr=2017&adult=2&child=0",
-				1100f);
-		flights.put(
-				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=MVD&dayDep=29&monthDep=10&yearDep=2017&dayArr=4&monthArr=11&yearArr=2017&adult=2&child=0",
-				1100f);
-		flights.put(
-				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SAO&dayDep=6&monthDep=5&yearDep=2017&dayArr=9&monthArr=5&yearArr=2017&adult=2&child=0",
-				480f);
-		flights.put(
-				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=SAO&dayDep=15&monthDep=6&yearDep=2017&dayArr=18&monthArr=6&yearArr=2017&adult=2&child=0",
-				480f);
-		flights.put(
-				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=CWB&dayDep=15&monthDep=6&yearDep=2017&dayArr=18&monthArr=6&yearArr=2017&adult=2&child=0",
-				590f);
-		flights.put(
-				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=VIX&dayDep=23&monthDep=9&yearDep=2017&dayArr=30&monthArr=9&yearArr=2017&adult=2&child=0",
-				820f);
-		flights.put(
-				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=VIX&dayDep=24&monthDep=9&yearDep=2017&dayArr=30&monthArr=9&yearArr=2017&adult=2&child=0",
-				820f);
-		flights.put(
-				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=VIX&dayDep=23&monthDep=9&yearDep=2017&dayArr=29&monthArr=9&yearArr=2017&adult=2&child=0",
-				820f);
-		flights.put(
-				"https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=VIX&dayDep=24&monthDep=9&yearDep=2017&dayArr=29&monthArr=9&yearArr=2017&adult=2&child=0",
-				820f);
+	// flights.put(
+	// "https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=VIX&dayDep=24&monthDep=9&yearDep=2017&dayArr=29&monthArr=9&yearArr=2017&adult=2&child=0",
+	// 820f);
 
+	private static String getURL(FlightMonitor flight) {
+		String retorno = null;
+
+		String dayDep = flight.getDtDep().substring(0, 2);
+		String monthDep = flight.getDtDep().substring(3, 5);
+		String yearDep = flight.getDtDep().substring(6);
+		String dayRet = flight.getDtRet().substring(0, 2);
+		String monthRet = flight.getDtRet().substring(3, 5);
+		String yearRet = flight.getDtRet().substring(6);
+
+		retorno = URL_FLIGHT_SERVICE + "/flight/voegol?from=" + flight.getFrom() + "&to=" + flight.getTo() + "&dayDep="
+				+ dayDep + "&monthDep=" + monthDep + "&yearDep=" + yearDep + "&dayArr=" + dayRet + "&monthArr="
+				+ monthRet + "&yearArr=" + yearRet + "&adult=" + flight.getAdult() + "&child=" + flight.getChild();
+
+		return retorno;
+	}
+
+	private static List<FlightMonitor> checkFlights() {
+		List<FlightMonitor> retorno = new ArrayList<FlightMonitor>();
+
+		HttpURLConnection connection = null;
+		InputStream is = null;
+		try {
+			// Create connection
+			URL url = new URL(URL_JSON_FLIGHTS);
+			connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestMethod(GET);
+			connection.setConnectTimeout(CONNECTION_TIMEOUT);
+			connection.setUseCaches(false);
+			connection.setDoInput(true);
+			connection.setDoOutput(true);
+
+			int codeResponse = connection.getResponseCode();
+			// String msgResponse = connection.getResponseMessage();
+
+			boolean isError = codeResponse >= 400;
+			is = isError ? connection.getErrorStream() : connection.getInputStream();
+			String contentEncoding = connection.getContentEncoding() != null ? connection.getContentEncoding()
+					: CHARSET;
+			String response = IOUtils.toString(is, contentEncoding);
+
+			if (!isError) {
+				Gson gson = new Gson();
+				FlightMonitor[] flightArray = gson.fromJson(response, FlightMonitor[].class);
+				retorno = new ArrayList<>(Arrays.asList(flightArray));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (is != null) {
+					is.close();
+				}
+			} catch (IOException e) {
+			}
+		}
+
+		return retorno;
 	}
 
 	public static void main(String[] args) {
 		while (true) {
-			Iterator iterator = flights.entrySet().iterator();
+			List<FlightMonitor> flights = checkFlights();
 
-			while (iterator.hasNext()) {
-				Map.Entry mentry = (Map.Entry) iterator.next();
-
+			for (FlightMonitor fltm : flights) {
 				HttpURLConnection connection = null;
+				InputStream is = null;
 				try {
-					// Create connection
-					URL url = new URL(mentry.getKey().toString());
+					String strUrl = getURL(fltm);
+					URL url = new URL(strUrl);
 					connection = (HttpURLConnection) url.openConnection();
 					connection.setRequestMethod(GET);
 					connection.setConnectTimeout(CONNECTION_TIMEOUT);
@@ -82,24 +111,23 @@ public class WorkerProcess {
 					String msgResponse = connection.getResponseMessage();
 
 					boolean isError = codeResponse >= 400;
-					InputStream is = isError ? connection.getErrorStream() : connection.getInputStream();
+					is = isError ? connection.getErrorStream() : connection.getInputStream();
 					String contentEncoding = connection.getContentEncoding() != null ? connection.getContentEncoding()
 							: CHARSET;
 					String response = IOUtils.toString(is, contentEncoding);
-					is.close();
 
 					if (isError) {
 						Slack slack = new Slack();
 						slack.sendMessage("[" + getCurrentDateTime() + "] Ocorreu o seguinte erro: " + codeResponse
-								+ " - " + msgResponse + "\nURL: " + mentry.getKey().toString(), Slack.ERROR);
-						System.err.println("Ocorreu o seguinte erro: " + response + "\nResponse: " + codeResponse + " - "
-								+ msgResponse);
+								+ " - " + msgResponse + "\nURL: " + strUrl, Slack.ERROR);
+						System.err.println("Ocorreu o seguinte erro: " + response + "\nResponse: " + codeResponse
+								+ " - " + msgResponse);
 					} else {
 						Flight flight = jsonToFlight(response.toString());
 
 						System.out.println("[" + getCurrentDateTime() + "] " + flight);
 
-						if (flight.getPriceTotal() < (Float) mentry.getValue()) {
+						if (flight.getPriceTotal() < fltm.getAlertPrice()) {
 							Slack slack = new Slack();
 							String resp = slack.sendMessage("[" + getCurrentDateTime() + "] Comprar voo " + flight,
 									Slack.INFO);
@@ -114,6 +142,12 @@ public class WorkerProcess {
 				} finally {
 					if (connection != null) {
 						connection.disconnect();
+					}
+					if (is != null) {
+						try {
+							is.close();
+						} catch (IOException e) {
+						}
 					}
 				}
 
