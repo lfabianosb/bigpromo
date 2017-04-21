@@ -129,7 +129,7 @@ public class WorkerProcess {
 			}
 
 			try {
-				Thread.sleep(300000); // 5min
+				Thread.sleep(Long.parseLong(System.getenv("SLEEP_TIME")));
 			} catch (InterruptedException e) {
 				Slack slack = new Slack();
 				slack.sendMessage("Erro: " + e.getMessage(), Slack.ERROR);
