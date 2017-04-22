@@ -19,16 +19,14 @@ import model.FlightMonitor;
 
 public class WorkerProcess {
 
+	private static final long SLEEP_TIME = Long.parseLong(System.getenv("SLEEP_TIME"));
+	private static final long SLEEP_TIME_BET_REQUESTS = Long.parseLong(System.getenv("SLEEP_TIME_BETWEEN_REQUESTS"));
+	private static final int GET_CONNECTION_TIMEOUT = Integer.parseInt(System.getenv("GET_CONNECTION_TIMEOUT"));
 	private static final String GET = "GET";
 	private static final String ZONE_ID = "GMT-03:00";
 	private static final String CHARSET = "UTF-8";
-	private static final int CONNECTION_TIMEOUT = 30000; // 30s
 	private static final String URL_JSON_FLIGHTS = "https://json-ds.herokuapp.com/flights";
 	private static final String URL_FLIGHT_SERVICE = "https://bigpromoservice.herokuapp.com";
-
-	// flights.put(
-	// "https://bigpromoservice.herokuapp.com/flight/voegol?from=JPA&to=VIX&dayDep=24&monthDep=9&yearDep=2017&dayArr=29&monthArr=9&yearArr=2017&adult=2&child=0",
-	// 820f);
 
 	private static String getURL(FlightMonitor flight) {
 		String retorno = null;
@@ -57,13 +55,12 @@ public class WorkerProcess {
 			URL url = new URL(URL_JSON_FLIGHTS);
 			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod(GET);
-			connection.setConnectTimeout(CONNECTION_TIMEOUT);
+			connection.setConnectTimeout(GET_CONNECTION_TIMEOUT);
 			connection.setUseCaches(false);
 			connection.setDoInput(true);
 			connection.setDoOutput(true);
 
 			int codeResponse = connection.getResponseCode();
-			// String msgResponse = connection.getResponseMessage();
 
 			boolean isError = codeResponse >= 400;
 			is = isError ? connection.getErrorStream() : connection.getInputStream();
@@ -102,7 +99,7 @@ public class WorkerProcess {
 					URL url = new URL(strUrl);
 					connection = (HttpURLConnection) url.openConnection();
 					connection.setRequestMethod(GET);
-					connection.setConnectTimeout(CONNECTION_TIMEOUT);
+					connection.setConnectTimeout(GET_CONNECTION_TIMEOUT);
 					connection.setUseCaches(false);
 					connection.setDoInput(true);
 					connection.setDoOutput(true);
@@ -151,9 +148,8 @@ public class WorkerProcess {
 					}
 				}
 
-				// Esperar 30 segundos entre as requisições
 				try {
-					Thread.sleep(30000);
+					Thread.sleep(SLEEP_TIME_BET_REQUESTS);
 				} catch (InterruptedException e) {
 					Slack slack = new Slack();
 					slack.sendMessage("Erro: " + e.getMessage(), Slack.ERROR);
@@ -163,7 +159,7 @@ public class WorkerProcess {
 			}
 
 			try {
-				Thread.sleep(Long.parseLong(System.getenv("SLEEP_TIME")));
+				Thread.sleep(SLEEP_TIME);
 			} catch (InterruptedException e) {
 				Slack slack = new Slack();
 				slack.sendMessage("Erro: " + e.getMessage(), Slack.ERROR);
