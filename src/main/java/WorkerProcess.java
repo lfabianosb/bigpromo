@@ -26,11 +26,11 @@ public class WorkerProcess {
 	private static final long SLEEP_TIME_BET_REQUESTS = Long.parseLong(System.getenv("SLEEP_TIME_BETWEEN_REQUESTS"));
 	private static final int GET_CONNECTION_TIMEOUT = Integer.parseInt(System.getenv("GET_CONNECTION_TIMEOUT"));
 	private static final String FIREBASE_AUTH = System.getenv("FIREBASE_AUTH");
+	private static final String URL_FLIGHT_SERVICE = System.getenv("FLIGHT_SERVICE");
+	private static final String URL_MONITOR_FLIGHTS = System.getenv("MONITOR_FLIGHTS");
 	private static final String GET = "GET";
 	private static final String ZONE_ID = "GMT-03:00";
 	private static final String CHARSET = "UTF-8";
-	private static final String URL_MONITOR_FLIGHTS = "https://bigpromo-ds.firebaseio.com/flights.json";
-	private static final String URL_FLIGHT_SERVICE = "https://bigpromoservice.herokuapp.com";
 
 	private static String getURL(FlightMonitor flight) {
 		String retorno = null;
