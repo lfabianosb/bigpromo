@@ -6,12 +6,15 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import messenger.Slack;
 import model.Flight;
@@ -22,10 +25,11 @@ public class WorkerProcess {
 	private static final long SLEEP_TIME = Long.parseLong(System.getenv("SLEEP_TIME"));
 	private static final long SLEEP_TIME_BET_REQUESTS = Long.parseLong(System.getenv("SLEEP_TIME_BETWEEN_REQUESTS"));
 	private static final int GET_CONNECTION_TIMEOUT = Integer.parseInt(System.getenv("GET_CONNECTION_TIMEOUT"));
+	private static final String FIREBASE_AUTH = System.getenv("FIREBASE_AUTH");
 	private static final String GET = "GET";
 	private static final String ZONE_ID = "GMT-03:00";
 	private static final String CHARSET = "UTF-8";
-	private static final String URL_JSON_FLIGHTS = "https://json-ds.herokuapp.com/flights";
+	private static final String URL_MONITOR_FLIGHTS = "https://bigpromo-ds.firebaseio.com/flights.json";
 	private static final String URL_FLIGHT_SERVICE = "https://bigpromoservice.herokuapp.com";
 
 	private static String getURL(FlightMonitor flight) {
@@ -47,12 +51,10 @@ public class WorkerProcess {
 
 	private static List<FlightMonitor> checkFlights() {
 		List<FlightMonitor> retorno = new ArrayList<FlightMonitor>();
-
 		HttpURLConnection connection = null;
 		InputStream is = null;
 		try {
-			// Create connection
-			URL url = new URL(URL_JSON_FLIGHTS);
+			URL url = new URL(URL_MONITOR_FLIGHTS + "?auth=" + FIREBASE_AUTH);
 			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod(GET);
 			connection.setConnectTimeout(GET_CONNECTION_TIMEOUT);
@@ -70,17 +72,23 @@ public class WorkerProcess {
 
 			if (!isError) {
 				Gson gson = new Gson();
-				FlightMonitor[] flightArray = gson.fromJson(response, FlightMonitor[].class);
-				retorno = new ArrayList<>(Arrays.asList(flightArray));
+				JsonObject obj = new JsonParser().parse(response).getAsJsonObject();
+				for(Map.Entry<String, JsonElement> entry : obj.entrySet()) {
+					FlightMonitor flight = gson.fromJson(entry.getValue(), FlightMonitor.class);
+					retorno.add(flight);
+				}
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				if (is != null) {
+			if (connection != null) {
+				connection.disconnect();
+			}
+			if (is != null) {
+				try {
 					is.close();
+				} catch (IOException e) {
 				}
-			} catch (IOException e) {
 			}
 		}
 
