@@ -29,13 +29,17 @@ public class Slack {
 			jsonMsg.addProperty("channel", "#general");
 			jsonMsg.addProperty("username", "webhookbot");
 			jsonMsg.addProperty("text", message);
-			if (type == Slack.ERROR)
+			switch (type) {
+			case Slack.ERROR:
 				jsonMsg.addProperty("icon_emoji", ":bug:");
-			if (type == Slack.ALERT)
+				break;
+			case Slack.ALERT:
 				jsonMsg.addProperty("icon_emoji", ":airplane:");
-			else // INFO
+				break;
+			default: // INFO
 				jsonMsg.addProperty("icon_emoji", ":eyes:");
-
+			}
+			
 			// Create connection
 			URL url = new URL(URL);
 			connection = (HttpURLConnection) url.openConnection();
@@ -63,7 +67,7 @@ public class Slack {
 				response.append('\n');
 			}
 			rd.close();
-			
+
 			return response.toString();
 		} catch (Exception e) {
 			e.printStackTrace();
