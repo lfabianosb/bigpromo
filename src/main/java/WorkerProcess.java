@@ -28,6 +28,7 @@ public class WorkerProcess {
 	private static final String FIREBASE_AUTH = System.getenv("FIREBASE_AUTH");
 	private static final String URL_FLIGHT_SERVICE = System.getenv("FLIGHT_SERVICE");
 	private static final String URL_MONITOR_FLIGHTS = System.getenv("MONITOR_FLIGHTS");
+	private static final int MSG_INFO_AFTER_N_TIMES = Integer.parseInt(System.getenv("MSG_INFO_AFTER_N_TIMES"));
 	private static final String GET = "GET";
 	private static final String ZONE_ID = "GMT-03:00";
 	private static final String CHARSET = "UTF-8";
@@ -73,7 +74,7 @@ public class WorkerProcess {
 			if (!isError) {
 				Gson gson = new Gson();
 				JsonObject obj = new JsonParser().parse(response).getAsJsonObject();
-				for(Map.Entry<String, JsonElement> entry : obj.entrySet()) {
+				for (Map.Entry<String, JsonElement> entry : obj.entrySet()) {
 					FlightMonitor flight = gson.fromJson(entry.getValue(), FlightMonitor.class);
 					retorno.add(flight);
 				}
@@ -96,6 +97,8 @@ public class WorkerProcess {
 	}
 
 	public static void main(String[] args) {
+		int counter = 1;
+
 		while (true) {
 			List<FlightMonitor> flights = checkFlights();
 
@@ -122,8 +125,7 @@ public class WorkerProcess {
 					String response = IOUtils.toString(is, contentEncoding);
 
 					if (isError) {
-						Slack slack = new Slack();
-						slack.sendMessage("[" + getCurrentDateTime() + "] Ocorreu o seguinte erro: " + codeResponse
+						new Slack().sendMessage("[" + getCurrentDateTime() + "] Ocorreu o seguinte erro: " + codeResponse
 								+ " - " + msgResponse + "\nURL: " + strUrl, Slack.ERROR);
 						System.err.println("Ocorreu o seguinte erro: " + response + "\nResponse: " + codeResponse
 								+ " - " + msgResponse);
@@ -135,7 +137,7 @@ public class WorkerProcess {
 						if (flight.getPriceTotal() < fltm.getAlertPrice()) {
 							Slack slack = new Slack();
 							String resp = slack.sendMessage("[" + getCurrentDateTime() + "] Comprar voo " + flight,
-									Slack.INFO);
+									Slack.ALERT);
 							System.out.println("Resposta da mensagem enviada para o Slack: " + resp);
 						}
 					}
@@ -159,23 +161,28 @@ public class WorkerProcess {
 				try {
 					Thread.sleep(SLEEP_TIME_BET_REQUESTS);
 				} catch (InterruptedException e) {
-					Slack slack = new Slack();
-					slack.sendMessage("Erro: " + e.getMessage(), Slack.ERROR);
+					new Slack().sendMessage("Erro: " + e.getMessage(), Slack.ERROR);
 					System.err.println("Erro: " + e.getMessage());
 					e.printStackTrace();
 				}
 			}
 
+			if ((counter++ % MSG_INFO_AFTER_N_TIMES) == 0) {
+				new Slack().sendMessage("[" + getCurrentDateTime() + "] I'm Working!", Slack.INFO);
+			}
+
 			try {
 				Thread.sleep(SLEEP_TIME);
 			} catch (InterruptedException e) {
-				Slack slack = new Slack();
-				slack.sendMessage("Erro: " + e.getMessage(), Slack.ERROR);
+				new Slack().sendMessage("Erro: " + e.getMessage(), Slack.ERROR);
 				System.err.println("Erro: " + e.getMessage());
 				e.printStackTrace();
 			}
-		}
 
+			// Reset counter
+			if (counter > 1000)
+				counter = 1;
+		}
 	}
 
 	private static Flight jsonToFlight(String json) {
