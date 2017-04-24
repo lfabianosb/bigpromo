@@ -22,13 +22,6 @@ import model.FlightMonitor;
 
 public class WorkerProcess {
 
-	private static final long SLEEP_TIME = Long.parseLong(System.getenv("SLEEP_TIME"));
-	private static final long SLEEP_TIME_BET_REQUESTS = Long.parseLong(System.getenv("SLEEP_TIME_BETWEEN_REQUESTS"));
-	private static final int GET_CONNECTION_TIMEOUT = Integer.parseInt(System.getenv("GET_CONNECTION_TIMEOUT"));
-	private static final String FIREBASE_AUTH = System.getenv("FIREBASE_AUTH");
-	private static final String URL_FLIGHT_SERVICE = System.getenv("FLIGHT_SERVICE");
-	private static final String URL_MONITOR_FLIGHTS = System.getenv("MONITOR_FLIGHTS");
-	private static final int MSG_INFO_AFTER_N_TIMES = Integer.parseInt(System.getenv("MSG_INFO_AFTER_N_TIMES"));
 	private static final String GET = "GET";
 	private static final String ZONE_ID = "GMT-03:00";
 	private static final String CHARSET = "UTF-8";
@@ -43,7 +36,7 @@ public class WorkerProcess {
 		String monthRet = flight.getDtRet().substring(3, 5);
 		String yearRet = flight.getDtRet().substring(6);
 
-		retorno = URL_FLIGHT_SERVICE + "/flight/voegol?from=" + flight.getFrom() + "&to=" + flight.getTo() + "&dayDep="
+		retorno = System.getenv("FLIGHT_SERVICE") + "/flight/voegol?from=" + flight.getFrom() + "&to=" + flight.getTo() + "&dayDep="
 				+ dayDep + "&monthDep=" + monthDep + "&yearDep=" + yearDep + "&dayArr=" + dayRet + "&monthArr="
 				+ monthRet + "&yearArr=" + yearRet + "&adult=" + flight.getAdult() + "&child=" + flight.getChild();
 
@@ -55,10 +48,10 @@ public class WorkerProcess {
 		HttpURLConnection connection = null;
 		InputStream is = null;
 		try {
-			URL url = new URL(URL_MONITOR_FLIGHTS + "?auth=" + FIREBASE_AUTH);
+			URL url = new URL(System.getenv("MONITOR_FLIGHTS") + "?auth=" + System.getenv("FIREBASE_AUTH"));
 			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod(GET);
-			connection.setConnectTimeout(GET_CONNECTION_TIMEOUT);
+			connection.setConnectTimeout(Integer.parseInt(System.getenv("GET_CONNECTION_TIMEOUT")));
 			connection.setUseCaches(false);
 			connection.setDoInput(true);
 			connection.setDoOutput(true);
@@ -110,7 +103,7 @@ public class WorkerProcess {
 					URL url = new URL(strUrl);
 					connection = (HttpURLConnection) url.openConnection();
 					connection.setRequestMethod(GET);
-					connection.setConnectTimeout(GET_CONNECTION_TIMEOUT);
+					connection.setConnectTimeout(Integer.parseInt(System.getenv("GET_CONNECTION_TIMEOUT")));
 					connection.setUseCaches(false);
 					connection.setDoInput(true);
 					connection.setDoOutput(true);
@@ -159,7 +152,7 @@ public class WorkerProcess {
 				}
 
 				try {
-					Thread.sleep(SLEEP_TIME_BET_REQUESTS);
+					Thread.sleep(Long.parseLong(System.getenv("SLEEP_TIME_BETWEEN_REQUESTS")));
 				} catch (InterruptedException e) {
 					new Slack().sendMessage("Erro: " + e.getMessage(), Slack.ERROR);
 					System.err.println("Erro: " + e.getMessage());
@@ -167,12 +160,12 @@ public class WorkerProcess {
 				}
 			}
 
-			if ((counter++ % MSG_INFO_AFTER_N_TIMES) == 0) {
+			if ((counter++ % Integer.parseInt(System.getenv("MSG_INFO_AFTER_N_TIMES"))) == 0) {
 				new Slack().sendMessage("[" + getCurrentDateTime() + "] I'm Working!", Slack.INFO);
 			}
 
 			try {
-				Thread.sleep(SLEEP_TIME);
+				Thread.sleep(Long.parseLong(System.getenv("SLEEP_TIME")));
 			} catch (InterruptedException e) {
 				new Slack().sendMessage("Erro: " + e.getMessage(), Slack.ERROR);
 				System.err.println("Erro: " + e.getMessage());
