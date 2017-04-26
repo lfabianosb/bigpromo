@@ -29,16 +29,8 @@ public class WorkerProcess {
 	private static String getURL(FlightMonitor flight) {
 		String retorno = null;
 
-		String dayDep = flight.getDtDep().substring(0, 2);
-		String monthDep = flight.getDtDep().substring(3, 5);
-		String yearDep = flight.getDtDep().substring(6);
-		String dayRet = flight.getDtRet().substring(0, 2);
-		String monthRet = flight.getDtRet().substring(3, 5);
-		String yearRet = flight.getDtRet().substring(6);
-
-		retorno = System.getenv("FLIGHT_SERVICE") + "/flight/voegol?from=" + flight.getFrom() + "&to=" + flight.getTo() + "&dayDep="
-				+ dayDep + "&monthDep=" + monthDep + "&yearDep=" + yearDep + "&dayArr=" + dayRet + "&monthArr="
-				+ monthRet + "&yearArr=" + yearRet + "&adult=" + flight.getAdult() + "&child=" + flight.getChild();
+		retorno = System.getenv("FLIGHT_SERVICE") + "/flight/voegol?from=" + flight.getFrom() + "&to=" + flight.getTo() + "&dep="
+				+ flight.getDtDep() + "&ret=" + flight.getDtRet() + "&adult=" + flight.getAdult() + "&child=" + flight.getChild();
 
 		return retorno;
 	}

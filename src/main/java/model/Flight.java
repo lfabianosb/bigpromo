@@ -4,96 +4,96 @@ public class Flight {
 	private String from;
 	private String to;
 	private String dateDeparture;
-	private String dateArrival;
+	private String dateReturn;
 	private int adult;
 	private int child;
-	private float priceDep;
-	private float priceRet;
-	
+	private float priceDeparture;
+	private float priceReturn;
+
 	public Flight() {
 	}
-	
-	public Flight(String from, String to, String dateDeparture, String dateArrival, int adult, int child) {
+
+	public Flight(String from, String to, String dateDeparture, String dateReturn, int adult, int child) {
 		this.setFrom(from);
 		this.setTo(to);
 		this.setDateDeparture(dateDeparture);
-		this.setDateArrival(dateArrival);
+		this.setDateReturn(dateReturn);
 		this.setAdult(adult);
 		this.setChild(child);
 	}
-	
-	public Flight(String from, String to, String dateDeparture, String dateArrival, int adult, int child, float priceDep, float priceRet) {
-		this.setFrom(from);
-		this.setTo(to);
-		this.setDateDeparture(dateDeparture);
-		this.setDateArrival(dateArrival);
-		this.setAdult(adult);
-		this.setChild(child);
-		this.setPriceDep(priceDep);
-		this.setPriceRet(priceRet);
-	}
-	
+
 	public String getFrom() {
 		return from;
 	}
+
 	public void setFrom(String from) {
 		this.from = from;
 	}
+
 	public String getTo() {
 		return to;
 	}
+
 	public void setTo(String to) {
 		this.to = to;
 	}
+
 	public String getDateDeparture() {
 		return dateDeparture;
 	}
+
 	public void setDateDeparture(String dateDeparture) {
 		this.dateDeparture = dateDeparture;
 	}
-	public String getDateArrival() {
-		return dateArrival;
+
+	public String getDateReturn() {
+		return dateReturn;
 	}
-	public void setDateArrival(String dateArrival) {
-		this.dateArrival = dateArrival;
+
+	public void setDateReturn(String dateReturn) {
+		this.dateReturn = dateReturn;
 	}
+
 	public int getAdult() {
 		return adult;
 	}
+
 	public void setAdult(int adult) {
 		this.adult = adult;
 	}
+
 	public int getChild() {
 		return child;
 	}
+
 	public void setChild(int child) {
 		this.child = child;
 	}
 
-	public float getPriceDep() {
-		return priceDep;
+	public float getPriceDeparture() {
+		return priceDeparture;
 	}
 
-	public void setPriceDep(float priceDep) {
-		this.priceDep = priceDep;
+	public void setPriceDeparture(float priceDeparture) {
+		this.priceDeparture = priceDeparture;
 	}
 
-	public float getPriceRet() {
-		return priceRet;
+	public float getPriceReturn() {
+		return priceReturn;
 	}
 
-	public void setPriceRet(float priceRet) {
-		this.priceRet = priceRet;
+	public void setPriceReturn(float priceReturn) {
+		this.priceReturn = priceReturn;
 	}
-	
+
 	public float getPriceTotal() {
-		return priceDep + priceRet;
+		return priceDeparture + priceReturn;
 	}
 
 	@Override
 	public String toString() {
-		return getFrom() + ", " + getTo() + ", " + getDateDeparture() + ", " + getDateArrival() + ", "
-				+ getAdult() + ", " + getChild() + ", " + getPriceDep() + ", " + getPriceRet() + ", " + getPriceTotal();
+		return getFrom() + ", " + getTo() + ", " + getDateDeparture() + ", " + getDateReturn() + ", " + getAdult()
+				+ ", " + getChild() + ", " + getPriceDeparture() + ", " + getPriceReturn() + ", " + getPriceTotal();
 	}
-	
+
 }
