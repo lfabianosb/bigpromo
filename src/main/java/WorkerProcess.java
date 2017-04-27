@@ -2,7 +2,7 @@ import job.FlightSearchJob;
 
 public class WorkerProcess {
 
-	private static final String GOL = "voegol";
+	private static final String GOL = "gol";
 	private static final String TAM = "latam";
 
 	public static void main(String[] args) {
