@@ -27,6 +27,8 @@ public class FlightSearchJob implements Runnable {
 	private static final String GET = "GET";
 	private static final String ZONE_ID = "GMT-03:00";
 	private static final String CHARSET = "UTF-8";
+	private static final int CONNECTION_RESET_EXCEPTION = 600;
+	private static final int SOCKET_TIMEOUT_EXCEPTION = 601;
 
 	private String company;
 
@@ -65,10 +67,14 @@ public class FlightSearchJob implements Runnable {
 					String now = getCurrentDateTime();
 
 					if (isError) {
-						new Slack().sendMessage("[" + now + "] Ocorreu o seguinte erro: " + codeResponse + " - "
-								+ msgResponse + "\nURL: " + strUrl, Slack.ERROR);
-						System.err.println("Ocorreu o seguinte erro: " + response + "\nResponse: " + codeResponse
-								+ " - " + msgResponse);
+						if (codeResponse != CONNECTION_RESET_EXCEPTION && codeResponse != SOCKET_TIMEOUT_EXCEPTION) {
+							new Slack().sendMessage("[" + now + "] Ocorreu o seguinte erro: " + codeResponse + " - "
+									+ msgResponse + "\nURL: " + strUrl, Slack.ERROR);
+							System.err.println("Ocorreu o seguinte erro: " + response + "\nResponse: " + codeResponse
+									+ " - " + msgResponse);
+						} else {
+							System.err.println("code response error = " + codeResponse);
+						}
 					} else {
 						Flight flight = new Gson().fromJson(response.toString(), Flight.class);
 
