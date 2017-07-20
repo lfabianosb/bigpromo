@@ -3,25 +3,14 @@ package model;
 public class FlightMonitor {
 	private String from;
 	private String to;
-	private String dtDep;
-	private String dtRet;
+	private String dtStart;
+	private String dtEnd;
+	private int minDays;
+	private int maxDays;
 	private int adult;
 	private int child;
+	private boolean nonStop = false;
 	private double alertPrice;
-
-	public FlightMonitor() {
-	}
-
-	public FlightMonitor(String from, String to, String dtDep, String dtRet, int adult, int child,
-			double alertPrice) {
-		this.setFrom(from);
-		this.setTo(to);
-		this.setDtDep(dtDep);
-		this.setDtRet(dtRet);
-		this.setAdult(adult);
-		this.setChild(child);
-		this.setAlertPrice(alertPrice);
-	}
 
 	public String getFrom() {
 		return from;
@@ -39,20 +28,36 @@ public class FlightMonitor {
 		this.to = to;
 	}
 
-	public String getDtDep() {
-		return dtDep;
+	public String getDtStart() {
+		return dtStart;
 	}
 
-	public void setDtDep(String dtDep) {
-		this.dtDep = dtDep;
+	public void setDtStart(String dtStart) {
+		this.dtStart = dtStart;
 	}
 
-	public String getDtRet() {
-		return dtRet;
+	public String getDtEnd() {
+		return dtEnd;
 	}
 
-	public void setDtRet(String dtRet) {
-		this.dtRet = dtRet;
+	public void setDtEnd(String dtEnd) {
+		this.dtEnd = dtEnd;
+	}
+
+	public int getMinDays() {
+		return minDays;
+	}
+
+	public void setMinDays(int minDays) {
+		this.minDays = minDays;
+	}
+
+	public int getMaxDays() {
+		return maxDays;
+	}
+
+	public void setMaxDays(int maxDays) {
+		this.maxDays = maxDays;
 	}
 
 	public int getAdult() {
@@ -71,6 +76,14 @@ public class FlightMonitor {
 		this.child = child;
 	}
 
+	public boolean isNonStop() {
+		return nonStop;
+	}
+
+	public void setNonStop(boolean nonStop) {
+		this.nonStop = nonStop;
+	}
+
 	public double getAlertPrice() {
 		return alertPrice;
 	}
@@ -81,8 +94,8 @@ public class FlightMonitor {
 
 	@Override
 	public String toString() {
-		return getFrom() + ", " + getTo() + ", " + getDtDep() + ", " + getDtRet() + ", " + getAdult() + ", "
-				+ getChild() + ", " + getAlertPrice();
+		return getFrom() + ", " + getTo() + ", " + getDtStart() + ", " + getDtEnd() + ", " + getMinDays() + ", "
+				+ getMaxDays() + ", " + getAdult() + ", " + getChild() + ", " + isNonStop() + ", " + getAlertPrice();
 	}
 
 }

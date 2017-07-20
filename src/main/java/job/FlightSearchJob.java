@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,73 +48,102 @@ public class FlightSearchJob implements Runnable {
 			for (FlightMonitor fltm : flights) {
 				HttpURLConnection connection = null;
 				InputStream is = null;
-				try {
-					String strUrl = getURL(fltm, company);
-					URL url = new URL(strUrl);
-					connection = (HttpURLConnection) url.openConnection();
-					connection.setRequestMethod(GET);
-					connection.setConnectTimeout(Integer.parseInt(System.getenv("GET_CONNECTION_TIMEOUT")));
-					connection.setUseCaches(false);
-					connection.setDoInput(true);
-					connection.setDoOutput(true);
 
-					int codeResponse = connection.getResponseCode();
-					String msgResponse = connection.getResponseMessage();
+				DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				LocalDate start = LocalDate.parse(fltm.getDtStart(), dtf);
+				LocalDate end = LocalDate.parse(fltm.getDtEnd(), dtf);
+				int minDays = fltm.getMinDays();
+				int maxDays = fltm.getMaxDays();
 
-					boolean isError = codeResponse >= 400;
-					is = isError ? connection.getErrorStream() : connection.getInputStream();
-					String contentEncoding = connection.getContentEncoding() != null ? connection.getContentEncoding()
-							: CHARSET;
-					String response = IOUtils.toString(is, contentEncoding);
-					String now = getCurrentDateTime();
-
-					if (isError) {
-						if (codeResponse != CONNECTION_RESET_EXCEPTION && codeResponse != SOCKET_TIMEOUT_EXCEPTION) {
-							new Slack().sendMessage("[" + now + "] Ocorreu o seguinte erro: " + codeResponse + " - "
-									+ msgResponse + "\nURL: " + strUrl, Slack.ERROR);
-							System.err.println("Ocorreu o seguinte erro: " + response + "\nResponse: " + codeResponse
-									+ " - " + msgResponse);
-						} else {
-							System.err.println("code response error = " + codeResponse);
-						}
-					} else {
-						Flight flight = new Gson().fromJson(response.toString(), Flight.class);
-
-						System.out.println(" [" + now + "] (" + company.toUpperCase() + "): " + flight);
-
-						if (flight.getPriceTotal() < fltm.getAlertPrice()) {
-							Slack slack = new Slack();
-							String resp = slack.sendMessage(
-									"[" + now + "] Comprar voo (" + company.toUpperCase() + ") " + flight, Slack.ALERT);
-
-							System.out.println("Resposta da mensagem enviada para o Slack: " + resp);
-						}
-					}
-				} catch (Exception e) {
-					Slack slack = new Slack();
-					slack.sendMessage("Erro: " + e.getMessage(), Slack.ERROR);
-					System.err.println("Erro: " + e.getMessage());
-					e.printStackTrace();
-				} finally {
-					if (is != null) {
-						try {
-							is.close();
-						} catch (IOException e) {
-						}
-					}
-					if (connection != null) {
-						connection.disconnect();
-					}
+				if (start.plusDays(maxDays).isAfter(end)) {
+					System.err.println("Intervalo maior que data final");
+					continue;
 				}
 
-				// Esperar entre cada voo que será pesquisado
-				try {
-					Thread.sleep(Long.parseLong(System.getenv("SLEEP_TIME_BETWEEN_REQUESTS")));
-				} catch (InterruptedException e) {
-					String now = getCurrentDateTime();
-					new Slack().sendMessage("[" + now + "] Erro: " + e.getMessage(), Slack.ERROR);
-					System.err.println("[" + now + "] Erro: " + e.getMessage());
-					e.printStackTrace();
+				int diff = maxDays - minDays;
+				int period = (int) ChronoUnit.DAYS.between(start, end) - minDays;
+				for (int i = 0; i <= period; i++) {
+					for (int j = 0; j <= diff; j++) {
+						LocalDate newStart = start.plusDays(i);
+						LocalDate newEnd = newStart.plusDays(minDays + j);
+
+						if (!newEnd.isAfter(end)) {
+							DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+							String dtDep = newStart.format(formatter);
+							String dtRet = newEnd.format(formatter);
+
+							try {
+								String strUrl = getURL(fltm, company, dtDep, dtRet);
+								URL url = new URL(strUrl);
+								connection = (HttpURLConnection) url.openConnection();
+								connection.setRequestMethod(GET);
+								connection.setConnectTimeout(Integer.parseInt(System.getenv("GET_CONNECTION_TIMEOUT")));
+								connection.setUseCaches(false);
+								connection.setDoInput(true);
+								connection.setDoOutput(true);
+
+								int codeResponse = connection.getResponseCode();
+								String msgResponse = connection.getResponseMessage();
+
+								boolean isError = codeResponse >= 400;
+								is = isError ? connection.getErrorStream() : connection.getInputStream();
+								String contentEncoding = connection.getContentEncoding() != null
+										? connection.getContentEncoding() : CHARSET;
+								String response = IOUtils.toString(is, contentEncoding);
+								String now = getCurrentDateTime();
+
+								if (isError) {
+									if (codeResponse != CONNECTION_RESET_EXCEPTION
+											&& codeResponse != SOCKET_TIMEOUT_EXCEPTION) {
+										new Slack().sendMessage("[" + now + "] Ocorreu o seguinte erro: " + codeResponse
+												+ " - " + msgResponse + "\nURL: " + strUrl, Slack.ERROR);
+										System.err.println("Ocorreu o seguinte erro: " + response + "\nResponse: "
+												+ codeResponse + " - " + msgResponse);
+									} else {
+										System.err.println("code response error = " + codeResponse);
+									}
+								} else {
+									Flight flight = new Gson().fromJson(response.toString(), Flight.class);
+
+									System.out.println(" [" + now + "] (" + company.toUpperCase() + "): " + flight);
+
+									if (flight.getPriceTotal() < fltm.getAlertPrice()) {
+										Slack slack = new Slack();
+										String resp = slack.sendMessage(
+												"[" + now + "] Comprar voo (" + company.toUpperCase() + ") " + flight,
+												Slack.ALERT);
+
+										System.out.println("Resposta da mensagem enviada para o Slack: " + resp);
+									}
+								}
+							} catch (Exception e) {
+								Slack slack = new Slack();
+								slack.sendMessage("Erro: " + e.getMessage(), Slack.ERROR);
+								System.err.println("Erro: " + e.getMessage());
+								e.printStackTrace();
+							} finally {
+								if (is != null) {
+									try {
+										is.close();
+									} catch (IOException e) {
+									}
+								}
+								if (connection != null) {
+									connection.disconnect();
+								}
+							}
+						}
+
+						// Esperar entre cada voo que será pesquisado
+						try {
+							Thread.sleep(Long.parseLong(System.getenv("SLEEP_TIME_BETWEEN_REQUESTS")));
+						} catch (InterruptedException e) {
+							String now = getCurrentDateTime();
+							new Slack().sendMessage("[" + now + "] Erro: " + e.getMessage(), Slack.ERROR);
+							System.err.println("[" + now + "] Erro: " + e.getMessage());
+							e.printStackTrace();
+						}
+					}
 				}
 			}
 
@@ -195,10 +226,10 @@ public class FlightSearchJob implements Runnable {
 	 * @param company
 	 * @return URL do serviço
 	 */
-	private String getURL(FlightMonitor flight, String company) {
+	private String getURL(FlightMonitor flight, String company, String dtDep, String dtRet) {
 		return System.getenv("FLIGHT_SERVICE") + "/flight/" + company + "?from=" + flight.getFrom() + "&to="
-				+ flight.getTo() + "&dep=" + flight.getDtDep() + "&ret=" + flight.getDtRet() + "&adult="
-				+ flight.getAdult() + "&child=" + flight.getChild();
+				+ flight.getTo() + "&dep=" + dtDep + "&ret=" + dtRet + "&adult=" + flight.getAdult() + "&child="
+				+ flight.getChild();
 	}
 
 	/**
