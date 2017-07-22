@@ -9,7 +9,7 @@ public class WorkerProcess {
 		Thread job1 = new Thread(new FlightSearchJob(GOL), GOL);
 		job1.start();
 
-		Thread job2 = new Thread(new FlightSearchJob(TAM), TAM);
-		job2.start();
+//		Thread job2 = new Thread(new FlightSearchJob(TAM), TAM);
+//		job2.start();
 	}
 }
